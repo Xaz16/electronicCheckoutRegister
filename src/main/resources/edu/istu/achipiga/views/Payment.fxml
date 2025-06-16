@@ -29,13 +29,13 @@
         </VBox>
 
         <Label text="Внесенная сумма:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
-        <TextField fx:id="cashAmountField" GridPane.rowIndex="2" GridPane.columnIndex="1" promptText="0.00" visible="false"/>
+        <TextField fx:id="cashAmountField" GridPane.rowIndex="2" GridPane.columnIndex="1" promptText="0.00"/>
 
         <Label text="Номер карты:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
         <TextField fx:id="cardNumberField" GridPane.rowIndex="3" GridPane.columnIndex="1" promptText="XXXX XXXX XXXX XXXX" visible="false"/>
 
         <Label text="Сдача:" GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
-        <Label fx:id="changeLabel" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-size: 14; -fx-text-fill: #336699;" visible="false"/>
+        <Label fx:id="changeLabel" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-size: 14; -fx-text-fill: #336699;"/>
     </GridPane>
 
     <HBox spacing="15" alignment="CENTER">

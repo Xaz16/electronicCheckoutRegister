@@ -35,9 +35,9 @@
     </HBox>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button text="Удалить выбранное" onAction="#removeSelected" style="-fx-base: #FF5252;"/>
-        <Button text="Очистить корзину" onAction="#clearCart" style="-fx-base: #FF5252;"/>
-        <Button text="Применить скидку" onAction="#applyDiscount" style="-fx-base: #FFC107;"/>
-        <Button text="Перейти к оплате" onAction="#proceedToPayment" style="-fx-base: #4CAF50; -fx-font-weight: bold;"/>
+        <Button fx:id="removeSelectedButton" text="Удалить выбранное" onAction="#removeSelected" style="-fx-base: #FF5252;"/>
+        <Button fx:id="clearCartButton" text="Очистить корзину" onAction="#clearCart" style="-fx-base: #FF5252;"/>
+        <Button fx:id="applyDiscountButton" text="Применить скидку" onAction="#applyDiscount" style="-fx-base: #FFC107;"/>
+        <Button fx:id="proceedToPaymentButton" text="Перейти к оплате" onAction="#proceedToPayment" style="-fx-base: #4CAF50; -fx-font-weight: bold;"/>
     </HBox>
 </VBox>

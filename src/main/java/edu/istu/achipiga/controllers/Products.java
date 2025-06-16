@@ -1,9 +1,6 @@
 package edu.istu.achipiga.controllers;
 
-import edu.istu.achipiga.CheckoutRegister;
-import edu.istu.achipiga.Organization;
 import edu.istu.achipiga.Product;
-import edu.istu.achipiga.dao.CheckoutRegisterDAO;
 import edu.istu.achipiga.dao.ProductDAO;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

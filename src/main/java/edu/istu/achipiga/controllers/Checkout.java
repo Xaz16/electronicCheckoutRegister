@@ -4,65 +4,68 @@ import edu.istu.achipiga.*;
 import edu.istu.achipiga.dao.CheckoutRegisterDAO;
 import edu.istu.achipiga.dao.CustomerDAO;
 import edu.istu.achipiga.dao.ReceiptDAO;
+import edu.istu.achipiga.services.ViewsService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import lombok.Getter;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 
 public class Checkout {
-
     @FXML
-    private TableView<BuyListItem> cartTable;
-    @FXML private TableColumn<BuyListItem, Integer> indexColumn;
-    @FXML private TableColumn<BuyListItem, String> productColumn;
-    @FXML private TableColumn<BuyListItem, BigDecimal> priceColumn;
-    @FXML private TableColumn<BuyListItem, Integer> quantityColumn;
-    @FXML private TableColumn<BuyListItem, BigDecimal> sumColumn;
+    private TableView<edu.istu.achipiga.BuyListItem> cartTable;
+    @FXML private TableColumn<edu.istu.achipiga.BuyListItem, Integer> indexColumn;
+    @FXML private TableColumn<edu.istu.achipiga.BuyListItem, String> productColumn;
+    @FXML private TableColumn<edu.istu.achipiga.BuyListItem, BigDecimal> priceColumn;
+    @FXML private TableColumn<edu.istu.achipiga.BuyListItem, Integer> quantityColumn;
+    @FXML private TableColumn<edu.istu.achipiga.BuyListItem, BigDecimal> sumColumn;
 
     @FXML private Label totalSumLabel;
     @FXML private Label discountLabel;
     @FXML private Label finalSumLabel;
+    @FXML private Button proceedToPaymentButton;
+    @FXML private Button applyDiscountButton;
+    @FXML private Button removeSelectedButton;
+    @FXML private Button clearCartButton;
 
-    @Getter
-    public static ObservableList<BuyListItem> BuyListItems = FXCollections.observableArrayList();
     private BigDecimal discount = BigDecimal.ZERO;
+    private boolean discountApplied = false;
     private static CheckoutRegister checkoutRegister = CheckoutRegisterDAO.getCurrentCheckoutRegister();
-
+    private StackPane contentArea;
 
     @FXML
     public void initialize() {
         setupTableColumns();
-        cartTable.setItems(BuyListItems);
+        cartTable.setItems(FXCollections.observableArrayList(checkoutRegister.getBuyList().getItems()));
         updateTotals();
-
-        BuyListItems.addListener(new ListChangeListener<BuyListItem>() {
-            public void onChanged(Change<?extends BuyListItem> change) {
-
-                while (change.next()) {
-                    if (change.wasAdded()) {
-                        BuyListItem changedItem = (BuyListItem) change.getAddedSubList().get(0);
-                        edu.istu.achipiga.BuyListItem item = new edu.istu.achipiga.BuyListItem(changedItem.getProduct(), 1);
-                        checkoutRegister.getBuyList().addItem(item);
-
-                    }
-                    if (change.wasRemoved()) {
-                        checkoutRegister.getBuyList().removeItem(change.getFrom());
-                    }
-
-                    updateTotals();
-                }
+        updateButtonsState();
+        
+        // Wait for the scene to be set
+        cartTable.sceneProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                contentArea = (StackPane) newVal.lookup("#contentArea");
             }
+        });
+
+        // Add listener to cart items to update button states
+        cartTable.getItems().addListener((javafx.collections.ListChangeListener.Change<? extends edu.istu.achipiga.BuyListItem> change) -> {
+            updateButtonsState();
+        });
+
+        // Add listener to selection model to update remove button state
+        cartTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            updateButtonsState();
         });
     }
 
@@ -70,12 +73,16 @@ public class Checkout {
         indexColumn.setCellValueFactory(cellData ->
                 new ReadOnlyObjectWrapper<>(cartTable.getItems().indexOf(cellData.getValue()) + 1));
 
-        productColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-        sumColumn.setCellValueFactory(new PropertyValueFactory<>("sum"));
+        productColumn.setCellValueFactory(cellData -> 
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getProduct().getName()));
+        priceColumn.setCellValueFactory(cellData -> 
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getProduct().getPrice()));
+        quantityColumn.setCellValueFactory(cellData -> 
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getQuantity()));
+        sumColumn.setCellValueFactory(cellData -> 
+                new ReadOnlyObjectWrapper<>(cellData.getValue().getTotalSum()));
 
-        priceColumn.setCellFactory(col -> new TableCell<BuyListItem, BigDecimal>() {
+        priceColumn.setCellFactory(col -> new TableCell<edu.istu.achipiga.BuyListItem, BigDecimal>() {
             @Override
             protected void updateItem(BigDecimal price, boolean empty) {
                 super.updateItem(price, empty);
@@ -83,7 +90,7 @@ public class Checkout {
             }
         });
 
-        sumColumn.setCellFactory(col -> new TableCell<BuyListItem, BigDecimal>() {
+        sumColumn.setCellFactory(col -> new TableCell<edu.istu.achipiga.BuyListItem, BigDecimal>() {
             @Override
             protected void updateItem(BigDecimal sum, boolean empty) {
                 super.updateItem(sum, empty);
@@ -93,47 +100,46 @@ public class Checkout {
     }
 
     public static void addProductToCart(Product product) {
-        for (BuyListItem item : BuyListItems) {
-            if (item.getProductId().equals(product.getId())) {
-                item.setQuantity(item.getQuantity() + 1);
-                checkoutRegister.getBuyList().getByProduct(item.getProduct().getId()).get().setQuantity(item.getQuantity() + 1);
-                return;
-            }
+        Optional<edu.istu.achipiga.BuyListItem> existingItem = checkoutRegister.getBuyList().getByProduct(product.getId());
+        if (existingItem.isPresent()) {
+            existingItem.get().setQuantity(existingItem.get().getQuantity() + 1);
+        } else {
+            checkoutRegister.getBuyList().addItem(new edu.istu.achipiga.BuyListItem(product, 1));
         }
-
-        BuyListItem newItem = new BuyListItem(
-                product,
-                1
-        );
-        BuyListItems.add(newItem);
     }
 
     @FXML
     private void removeSelected() {
-        BuyListItem selected = cartTable.getSelectionModel().getSelectedItem();
+        edu.istu.achipiga.BuyListItem selected = cartTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            BuyListItems.remove(selected);
+            checkoutRegister.getBuyList().removeItem(selected);
+            cartTable.getItems().remove(selected);
             updateTotals();
+            updateButtonsState();
         }
     }
 
     @FXML
     private void clearCart() {
-        BuyListItems.clear();
+        checkoutRegister.getBuyList().getItems().clear();
+        cartTable.getItems().clear();
         discount = BigDecimal.ZERO;
+        discountApplied = false;
         updateTotals();
+        updateButtonsState();
     }
 
     @FXML
     private void applyDiscount() {
         Customer customer = CustomerDAO.getCurrentCustomer();
         discount = customer.getDiscountCard().getDiscount();
+        discountApplied = true;
         updateTotals();
     }
 
     @FXML
     private void proceedToPayment() {
-        if (BuyListItems.isEmpty()) return;
+        if (checkoutRegister.getBuyList().getItems().isEmpty()) return;
 
         showPaymentScreen();
     }
@@ -164,52 +170,108 @@ public class Checkout {
         return calculateFinalSum(calculateTotal());
     }
 
-
     private void showPaymentScreen() {
+        if (contentArea == null) {
+            contentArea = (StackPane) cartTable.getScene().lookup("#contentArea");
+        }
+        
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/edu/istu/achipiga/views/Payment.fxml"));
             Parent paymentView = loader.load();
-
             Payment paymentController = loader.getController();
+            
             paymentController.setup(getFinalSum(), new Payment.PaymentCallback() {
                 @Override
                 public void onPaymentSuccess(Receipt receipt) {
-                    // Обработка успешной оплаты
                     System.out.println("Оплата прошла: " + receipt);
+                    // Save buy list before creating receipt
+                    CheckoutRegisterDAO.saveBuyList(checkoutRegister.getBuyList());
+                    
+                    // Set discount information in the receipt
+                    if (discountApplied) {
+                        receipt.setDiscountAmount(calculateTotal().multiply(discount));
+                    }
+                    
                     saveReceipt(receipt);
                     clearCart();
-                    showPaymentSuccess(receipt);
+
+                    try {
+                        Parent view = ViewsService.getInstance().loadViewAndGetRoot("/edu/istu/achipiga/views/Checkout.fxml");
+                        contentArea.getChildren().setAll(view);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
                 public void onPaymentCancel() {
-                    // Возврат в корзину
                     System.out.println("Оплата отменена");
+                    try {
+                        Parent view = ViewsService.getInstance().loadViewAndGetRoot("/edu/istu/achipiga/views/Checkout.fxml");
+                        contentArea.getChildren().setAll(view);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
 
-            // Замена содержимого главного окна
-            Stage stage = (Stage) cartTable.getScene().getWindow();
-            stage.getScene().setRoot(paymentView);
+            // Pass discount information to the payment controller
+            paymentController.setDiscountInfo(discountApplied, discount);
+
+            // Load the payment view into the center area
+            contentArea.getChildren().setAll(paymentView);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void saveReceipt(Receipt receipt) {
-        ReceiptDAO.insertNew(receipt);
+        Receipt savedReceipt = ReceiptDAO.insertNew(receipt);
+        if (savedReceipt == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Ошибка");
+            alert.setHeaderText("Не удалось сохранить чек");
+            alert.setContentText("Пожалуйста, попробуйте еще раз.");
+            alert.showAndWait();
+            return;
+        }
+        showPaymentSuccess(savedReceipt);
     }
 
     private void showPaymentSuccess(Receipt receipt) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        
+        // Parse and format the date
+        String formattedTime = java.time.Instant.parse(receipt.time)
+            .atZone(java.time.ZoneId.systemDefault())
+            .format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss dd.MM.yyyy"));
+            
         alert.setTitle("Оплата прошла успешно");
-        alert.setHeaderText("Чек #" + receipt.getId());
-        alert.setContentText(String.format(
-                "Сумма: %,.2f руб.\nСпособ оплаты: %s\nСдача: %,.2f руб.",
-                receipt.getAmount(),
-                receipt.getPaymentMethodLabelString(),
-                receipt.getChange()
-        ));
+        alert.setHeaderText(String.format("Чек #%d от %s", receipt.getId(), formattedTime));
+        
+        StringBuilder content = new StringBuilder();
+        content.append(String.format("Тип чека: %s\n", receipt.getReceiptType().getLabel()));
+        content.append(String.format("Покупатель: %s\n", receipt.getCustomer().getName()));
+        content.append(String.format("Сумма покупки (до скидки): %,.2f руб.\n", receipt.getTotalAmount()));
+        content.append(String.format("Скидка: %,.2f руб.\n", receipt.getDiscountAmount()));
+        content.append(String.format("Итого к оплате: %,.2f руб.\n", receipt.getTotalAmount().subtract(receipt.getDiscountAmount())));
+        content.append(String.format("Внесено: %,.2f руб.\n", receipt.getProvidedSum()));
+        content.append(String.format("Сдача: %,.2f руб.\n", receipt.getProvidedSum().subtract(receipt.getTotalAmount().subtract(receipt.getDiscountAmount()))));
+        content.append(String.format("Способ оплаты: %s\n", receipt.getPaymentMethodLabelString()));
+        content.append(String.format("\nОрганизация: %s", 
+            receipt.getCheckoutRegister().getOrganization().name));
+        
+        alert.setContentText(content.toString());
         alert.showAndWait();
+    }
+
+    private void updateButtonsState() {
+        boolean hasItems = !checkoutRegister.getBuyList().getItems().isEmpty();
+        boolean hasSelection = cartTable.getSelectionModel().getSelectedItem() != null;
+        
+        proceedToPaymentButton.setDisable(!hasItems);
+        applyDiscountButton.setDisable(!hasItems);
+        clearCartButton.setDisable(!hasItems);
+        removeSelectedButton.setDisable(!hasSelection);
     }
 }

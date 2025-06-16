@@ -1,5 +1,6 @@
 package edu.istu.achipiga;
 
+import edu.istu.achipiga.services.ViewsService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,6 +14,9 @@ public class ElectronicCheckoutRegister extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         DatabaseInitializer.initializeDatabase();
+        
+        // Initialize ViewsService with primary stage
+        ViewsService.getInstance().setPrimaryStage(stage);
 
         Parent root = FXMLLoader.load(getClass().getResource("views/Main.fxml"));
         Scene scene = new Scene(root, 1200, 1000);

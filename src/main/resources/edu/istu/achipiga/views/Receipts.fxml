@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="edu.istu.achipiga.controllers.Receipts"
+      spacing="10">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+    
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Чеки" style="-fx-font-size: 24px;"/>
+    </HBox>
+
+    <TableView fx:id="receiptsTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+            <TableColumn fx:id="timeColumn" text="Время" prefWidth="150"/>
+            <TableColumn fx:id="typeColumn" text="Тип" prefWidth="100"/>
+            <TableColumn fx:id="customerColumn" text="Клиент" prefWidth="150"/>
+            <TableColumn fx:id="paymentMethodColumn" text="Способ оплаты" prefWidth="120"/>
+            <TableColumn fx:id="paidSumColumn" text="Оплачено" prefWidth="100"/>
+            <TableColumn fx:id="exchangeColumn" text="Сдача" prefWidth="100"/>
+            <TableColumn fx:id="discountColumn" text="Скидка" prefWidth="100"/>
+            <TableColumn fx:id="totalColumn" text="Итого" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button fx:id="viewDetailsButton" text="Просмотр деталей" onAction="#onViewDetails"/>
+    </HBox>
+</VBox> 

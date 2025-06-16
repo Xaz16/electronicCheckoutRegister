@@ -2,14 +2,14 @@ package edu.istu.achipiga.controllers;
 
 import edu.istu.achipiga.CheckoutRegister;
 import edu.istu.achipiga.dao.CheckoutRegisterDAO;
+import edu.istu.achipiga.services.ViewsService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import java.io.IOException;
-import java.net.URL;
 
 public class Main {
     @FXML
@@ -31,19 +31,11 @@ public class Main {
 
     private void loadView(String fxmlPath) {
         try {
-            // Try to get resource from multiple possible locations
-            URL resource = getClass().getResource(fxmlPath);
-            if (resource == null) {
-                System.out.println("FXML file not found at path: " + fxmlPath);
-                return;
-            }
-
-            Node view = FXMLLoader.load(resource);
+            Parent view = ViewsService.getInstance().loadViewAndGetRoot(fxmlPath);
             contentArea.getChildren().setAll(view);
         } catch (IOException e) {
             System.out.println("Error loading FXML file: " + e.getMessage());
-            System.out.println("Stack trace: " + e.getStackTrace()[0]);
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -52,7 +44,6 @@ public class Main {
         loadView("/edu/istu/achipiga/views/Products.fxml");
     }
 
-
     @FXML
     private void showCheckout() {
         loadView("/edu/istu/achipiga/views/Checkout.fxml");
@@ -60,7 +51,7 @@ public class Main {
 
     @FXML
     private void showReports() {
-        loadView("/edu/istu/achipiga/views/Reports.fxml");
+        loadView("/edu/istu/achipiga/views/Receipts.fxml");
     }
 
     @FXML

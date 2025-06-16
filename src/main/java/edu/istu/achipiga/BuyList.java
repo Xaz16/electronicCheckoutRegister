@@ -18,9 +18,12 @@ public class BuyList {
     /**
      * 
      */
-
     @Getter
     private List<BuyListItem> items = new ArrayList<>();
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     /**
      * @return

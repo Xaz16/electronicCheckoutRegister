@@ -9,7 +9,6 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-
 public class Product {
     @Getter
     private String id;
@@ -28,25 +27,7 @@ public class Product {
         this.price = price;
     }
 
-
     public int getDiscountedPrice(DiscountCard card) {
-//        return price.subtract(price.multiply(card.getDiscountPercent()));
         return 0;
     }
-
-//    public String getId() {
-//        return id;
-//    }
-//
-//    public String getName() {
-//        return name;
-//    }
-//
-//    public String getCategory() {
-//        return category;
-//    }
-//
-//    public BigInteger getPrice() {
-//        return price;
-//    }
 }
