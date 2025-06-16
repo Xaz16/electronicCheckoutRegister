@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox stylesheets="/Payment.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" spacing="15" style="-fx-padding: 20;" fx:controller="edu.istu.achipiga.controllers.Payment" alignment="TOP_CENTER">
+    <fx:define>
+        <ToggleGroup fx:id="paymentMethodGroup"/>
+    </fx:define>
+
+    <Label text="Оплата покупки" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+
+    <GridPane hgap="10" vgap="10" alignment="CENTER">
+        <columnConstraints>
+            <ColumnConstraints halignment="RIGHT" minWidth="150"/>
+            <ColumnConstraints halignment="LEFT" minWidth="200"/>
+        </columnConstraints>
+
+        <Label text="Сумма к оплате:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
+        <Label fx:id="amountLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+
+        <Label text="Способ оплаты:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
+        <VBox GridPane.rowIndex="1" GridPane.columnIndex="1" spacing="5">
+            <RadioButton fx:id="cashRadioButton" text="Наличными" toggleGroup="$paymentMethodGroup" userData="CASH" selected="true"/>
+            <RadioButton fx:id="cardRadioButton" text="Банковской картой" toggleGroup="$paymentMethodGroup" userData="CARD"/>
+        </VBox>
+
+        <Label text="Внесенная сумма:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
+        <TextField fx:id="cashAmountField" GridPane.rowIndex="2" GridPane.columnIndex="1" promptText="0.00" visible="false"/>
+
+        <Label text="Номер карты:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
+        <TextField fx:id="cardNumberField" GridPane.rowIndex="3" GridPane.columnIndex="1" promptText="XXXX XXXX XXXX XXXX" visible="false"/>
+
+        <Label text="Сдача:" GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
+        <Label fx:id="changeLabel" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-size: 14; -fx-text-fill: #336699;" visible="false"/>
+    </GridPane>
+
+    <HBox spacing="15" alignment="CENTER">
+        <Button text="Назад" onAction="#goBack" style="-fx-base: #F44336; -fx-min-width: 100;"/>
+        <Button text="Подтвердить оплату" onAction="#processPayment" style="-fx-base: #4CAF50; -fx-font-weight: bold; -fx-min-width: 150;"/>
+    </HBox>
+
+    <Label fx:id="statusLabel" style="-fx-text-fill: #FF5722;"/>
+</VBox>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.istu.achipiga.controllers.Main">
+
+    <top>
+        <HBox style="-fx-background-color: #336699; -fx-padding: 10;">
+            <Label style="-fx-text-fill: white; -fx-font-size: 20;" text="Электронная касса">
+            <HBox.margin>
+               <Insets right="20.0" />
+            </HBox.margin>
+            <Region HBox.hgrow="ALWAYS" />
+            <padding>
+               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding></Label>
+         <HBox alignment="CENTER">
+            <children>
+                  <Button onAction="#showProducts" style="-fx-margin: 0 10;" text="Товары">
+                  <HBox.margin>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </HBox.margin>
+               </Button>
+                  <Button onAction="#showCheckout" text="Корзина" />
+            </children>
+            <opaqueInsets>
+               <Insets />
+            </opaqueInsets>
+         </HBox>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox minWidth="200.0" style="-fx-background-color: #f0f0f0; -fx-padding: 10;">
+            <Button minWidth="80.0" onAction="#showInfo" text="Инфо">
+            <VBox.margin>
+               <Insets bottom="10.0" />
+            </VBox.margin></Button>
+            <Button minWidth="80.0" onAction="#showReports" text="Чеки" />
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane fx:id="contentArea" />
+    </center>
+
+    <bottom>
+      <HBox alignment="CENTER_LEFT" style="-fx-padding: 5; -fx-background-color: #e0e0e0;">
+         <children>
+              <Label style="-fx-margin-right: auto;" text="Готов к работе"><padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+              </padding></Label>
+             <Label fx:id="workshiftLabel">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding></Label>
+             <Label fx:id="employeeLabel">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding></Label>
+         </children>
+      </HBox>
+    </bottom>
+</BorderPane>

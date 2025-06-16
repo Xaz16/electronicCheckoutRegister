@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" spacing="10" style="-fx-padding: 15;" fx:controller="edu.istu.achipiga.controllers.Checkout">
+    <Label text="Текущий лист покупок" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+
+    <TableView fx:id="cartTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn text="№" fx:id="indexColumn" sortable="false" style="-fx-alignment: CENTER;"/>
+            <TableColumn text="Товар" fx:id="productColumn" sortable="false"/>
+            <TableColumn text="Цена" fx:id="priceColumn" sortable="false" style="-fx-alignment: CENTER_RIGHT;"/>
+            <TableColumn text="Кол-во" fx:id="quantityColumn" sortable="false" style="-fx-alignment: CENTER;"/>
+            <TableColumn text="Сумма" fx:id="sumColumn" sortable="false" style="-fx-alignment: CENTER_RIGHT;"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
+    <HBox spacing="20" alignment="CENTER_RIGHT">
+        <VBox spacing="5" alignment="CENTER_RIGHT">
+            <Label text="Итого:" style="-fx-font-size: 14;"/>
+            <Label text="Скидка:" style="-fx-font-size: 14;"/>
+            <Label text="К оплате:" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+        </VBox>
+
+        <VBox spacing="5" alignment="CENTER_RIGHT">
+            <Label fx:id="totalSumLabel" style="-fx-font-size: 14; -fx-text-fill: #336699;"/>
+            <Label fx:id="discountLabel" style="-fx-font-size: 14; -fx-text-fill: #FF5722;"/>
+            <Label fx:id="finalSumLabel" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #336699;"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Удалить выбранное" onAction="#removeSelected" style="-fx-base: #FF5252;"/>
+        <Button text="Очистить корзину" onAction="#clearCart" style="-fx-base: #FF5252;"/>
+        <Button text="Применить скидку" onAction="#applyDiscount" style="-fx-base: #FFC107;"/>
+        <Button text="Перейти к оплате" onAction="#proceedToPayment" style="-fx-base: #4CAF50; -fx-font-weight: bold;"/>
+    </HBox>
+</VBox>
