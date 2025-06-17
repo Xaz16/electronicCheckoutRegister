@@ -50,16 +50,4 @@ public class Organization {
         this.boss = boss;
     }
 
-    @Override
-    public String toString() {
-        return "Organization{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", checkoutRegisters=" + checkoutRegisters +
-                ", workers=" + workers +
-                ", location=" + location +
-                ", inn='" + inn + '\'' +
-                ", boss=" + boss +
-                '}';
-    }
 }

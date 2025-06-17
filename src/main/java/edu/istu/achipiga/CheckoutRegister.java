@@ -42,13 +42,4 @@ public class CheckoutRegister {
         this.organization = organization;
     }
 
-    /**
-     * @return
-     */
-    public void finalizeBuyList() {
-        buyList.getTotalSum();
-
-        buyList = new BuyList();
-    }
-
 }
