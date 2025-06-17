@@ -5,11 +5,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReceiptDAO {
-    public static Receipt insertNew(Receipt receipt) {
+public class ReceiptDAO extends BaseDAO<Receipt> {
+    @Override
+    public Receipt save(Receipt receipt) {
         String insertSQL = "INSERT INTO receipts(time, workshift_id, customer_id, bank_card_id, checkout_register_id, buy_list_id, payment_method, receipt_type, provided_sum, discount_amount, total_amount) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
+        try (Connection conn = getConnection()) {
             PreparedStatement pstmt = conn.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS);
 
             String workshiftSQL = "SELECT id FROM workshifts WHERE employee_id = 6 ORDER BY id DESC LIMIT 1";
@@ -50,14 +51,15 @@ public class ReceiptDAO {
         }
     }
 
-    public static List<Receipt> loadReceipts() {
+    @Override
+    public List<Receipt> getAll() {
         List<Receipt> receipts = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
+        try (Connection conn = getConnection()) {
             String sql = "SELECT * FROM receipts ORDER BY time DESC";
             ResultSet rs = conn.createStatement().executeQuery(sql);
             
             while (rs.next()) {
-                Receipt receipt = ReceiptDAO.getById(rs.getInt("id"));
+                Receipt receipt = getById(rs.getInt("id"));
                 if (receipt != null) {
                     receipts.add(receipt);
                 }
@@ -71,8 +73,9 @@ public class ReceiptDAO {
         }
     }
 
-    public static Receipt getById(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
+    @Override
+    public Receipt getById(int id) {
+        try (Connection conn = getConnection()) {
             String receiptSQL = "SELECT * FROM receipts WHERE id = ?";
             PreparedStatement receiptStmt = conn.prepareStatement(receiptSQL);
             receiptStmt.setInt(1, id);
@@ -82,12 +85,12 @@ public class ReceiptDAO {
                 return null;
             }
             
-            CheckoutRegister register = CheckoutRegisterDAO.getById(receiptRs.getInt("checkout_register_id"));
+            CheckoutRegister register = new CheckoutRegisterDAO().getById(receiptRs.getInt("checkout_register_id"));
             if (register == null) {
                 return null;
             }
 
-            Customer currentCustomer = CustomerDAO.getCurrentCustomer();
+            Customer currentCustomer = new CustomerDAO().getCurrent();
             
             Receipt receipt = new Receipt(
                 currentCustomer,
@@ -98,7 +101,7 @@ public class ReceiptDAO {
             receipt.setId(id);
             receipt.time = receiptRs.getString("time");
             receipt.setDiscountAmount(receiptRs.getBigDecimal("discount_amount"));
-            receipt.setBuyList(BuyListDAO.getById(receiptRs.getInt("buy_list_id")));
+            receipt.setBuyList(new BuyListDAO().getById(receiptRs.getInt("buy_list_id")));
             receipt.setTotalAmount(receiptRs.getBigDecimal("total_amount"));
 
             if(receiptRs.getInt("bank_card_id") != 0) {
@@ -111,4 +114,15 @@ public class ReceiptDAO {
             return null;
         }
     }
+
+    @Override
+    void delete(Receipt instance) {
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    Receipt getCurrent() {
+        throw new UnsupportedOperationException("Unimplemented method 'getCurrent'");
+    }
+    
 }

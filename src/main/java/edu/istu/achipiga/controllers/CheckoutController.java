@@ -1,9 +1,7 @@
 package edu.istu.achipiga.controllers;
 
 import edu.istu.achipiga.*;
-import edu.istu.achipiga.dao.CheckoutRegisterDAO;
-import edu.istu.achipiga.dao.CustomerDAO;
-import edu.istu.achipiga.dao.ReceiptDAO;
+import edu.istu.achipiga.dao.DAOFactory;
 import edu.istu.achipiga.services.ViewsService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -38,7 +36,7 @@ public class CheckoutController {
 
     private BigDecimal discount = BigDecimal.ZERO;
     private boolean discountApplied = false;
-    private static CheckoutRegister checkoutRegister = CheckoutRegisterDAO.getCurrentCheckoutRegister();
+    private static CheckoutRegister checkoutRegister = DAOFactory.getInstance().getCheckoutRegisterDAO().getCurrent();
     private StackPane contentArea;
 
     @FXML
@@ -125,7 +123,7 @@ public class CheckoutController {
 
     @FXML
     private void applyDiscount() {
-        Customer customer = CustomerDAO.getCurrentCustomer();
+        Customer customer = DAOFactory.getInstance().getCustomerDAO().getCurrent();
         discount = customer.getDiscountCard().getDiscount();
         discountApplied = true;
         updateTotals();
@@ -183,7 +181,7 @@ public class CheckoutController {
                     receipt.setTotalAmount(total);
                     receipt.setDiscountAmount(discountAmount);
 
-                    CheckoutRegisterDAO.saveBuyList(checkoutRegister.getBuyList());
+                    DAOFactory.getInstance().getBuyListDAO().save(checkoutRegister.getBuyList());
                     saveReceipt(receipt);
                     clearCart();
 
@@ -215,7 +213,7 @@ public class CheckoutController {
     }
 
     private void saveReceipt(Receipt receipt) {
-        Receipt savedReceipt = ReceiptDAO.insertNew(receipt);
+        Receipt savedReceipt = DAOFactory.getInstance().getReceiptDAO().save(receipt);
         if (savedReceipt == null) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Ошибка");

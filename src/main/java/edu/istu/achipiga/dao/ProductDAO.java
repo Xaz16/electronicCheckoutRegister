@@ -1,22 +1,23 @@
 package edu.istu.achipiga.dao;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ProductDAO {
+import edu.istu.achipiga.Product;
 
-    public static ObservableList<edu.istu.achipiga.Product> getAllProducts(String search) {
+public class ProductDAO extends BaseDAO<edu.istu.achipiga.Product> {
 
-        ObservableList<edu.istu.achipiga.Product> products = FXCollections.observableArrayList();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
-            ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM products WHERE name LIKE '%" + search + "%'");
+    @Override
+    public List<edu.istu.achipiga.Product> getAll() {
+
+        List<edu.istu.achipiga.Product> products = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM products" + (context.getSearchQuery() != null ? " WHERE name LIKE '%" + context.getSearchQuery() + "%'" : ""));
             while (rs.next()) {
                 products.add(new edu.istu.achipiga.Product(
                         rs.getString("id"),
@@ -29,11 +30,12 @@ public class ProductDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return FXCollections.observableArrayList();
+        return products;
     }
 
-    public static edu.istu.achipiga.Product getById(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
+    @Override
+    public edu.istu.achipiga.Product getById(int id) {
+        try (Connection conn = getConnection()) {
             String sql = "SELECT * FROM products WHERE id = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
@@ -54,4 +56,20 @@ public class ProductDAO {
             return null;
         }
     }
+
+    @Override
+    void delete(edu.istu.achipiga.Product instance) {
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    Product save(Product instance) {
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    @Override
+    Product getCurrent() {
+        throw new UnsupportedOperationException("Unimplemented method 'getCurrent'");
+    }
+    
 }

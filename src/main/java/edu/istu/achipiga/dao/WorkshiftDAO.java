@@ -2,10 +2,12 @@ package edu.istu.achipiga.dao;
 
 import edu.istu.achipiga.*;
 import java.sql.*;
+import java.util.List;
 
-public class WorkshiftDAO {
-    public static Workshift getById(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
+public class WorkshiftDAO extends BaseDAO<Workshift> {
+    @Override
+    public Workshift getById(int id) {
+        try (Connection conn = getConnection()) {
             String sql = "SELECT * FROM workshifts WHERE id = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
@@ -41,5 +43,25 @@ public class WorkshiftDAO {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    List<Workshift> getAll() {
+        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
+    }
+
+    @Override
+    Workshift save(Workshift instance) {
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    @Override
+    void delete(Workshift instance) {
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    Workshift getCurrent() {
+        throw new UnsupportedOperationException("Unimplemented method 'getCurrent'");
     }
 } 

@@ -5,14 +5,23 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CheckoutRegisterDAO {
-    private static CheckoutRegister instance = null;
+public class CheckoutRegisterDAO extends BaseDAO<CheckoutRegister> {
+    WorkshiftDAO workshiftDAO = new WorkshiftDAO();
+    OrganizationDAO organizationDAO = new OrganizationDAO();
 
-    public static CheckoutRegister getCurrentCheckoutRegister() {
-        if(instance != null) {
-            return instance;
-        }
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
+    @Override
+    public CheckoutRegister getCurrentInstance() {
+        return super.getCurrentInstance();
+    }
+
+    @Override
+    public void setCurrentInstance(CheckoutRegister instance) {
+        super.setCurrentInstance(instance);
+    }
+
+    @Override
+    public CheckoutRegister getCurrent() {
+        try (Connection conn = getConnection()) {
             String sql = "SELECT * FROM checkout_registers ORDER BY id DESC LIMIT 1";
             ResultSet rs = conn.createStatement().executeQuery(sql);
             
@@ -21,25 +30,24 @@ public class CheckoutRegisterDAO {
             }
             
             int id = rs.getInt("id");
-            int locationId = rs.getInt("location_id");
             int organizationId = rs.getInt("organization_id");
             
-            Organization organization = OrganizationDAO.getById(organizationId);
+            Organization organization = organizationDAO.getById(organizationId);
             if (organization == null) {
                 return null;
             }
 
-            instance = new CheckoutRegister(id, new BuyList(), WorkshiftDAO.getById(1), organization);
-            
-            return instance;
+            setCurrentInstance(new CheckoutRegister(id, new BuyList(), workshiftDAO.getById(1), organization));
+            return getCurrentInstance();
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public static CheckoutRegister getById(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
+    @Override
+    public CheckoutRegister getById(int id) {
+        try (Connection conn = getConnection()) {
             String sql = "SELECT * FROM checkout_registers WHERE id = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
@@ -50,22 +58,23 @@ public class CheckoutRegisterDAO {
             }
             
             int organizationId = rs.getInt("organization_id");
-            Organization organization = OrganizationDAO.getById(organizationId);
+            Organization organization = organizationDAO.getById(organizationId);
             
             if (organization == null) {
                 return null;
             }
             
-            return new CheckoutRegister(id, new BuyList(), WorkshiftDAO.getById(1), organization);
+            return new CheckoutRegister(id, new BuyList(), workshiftDAO.getById(1), organization);
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            return null;        
         }
     }
 
-    public static List<CheckoutRegister> getAll() {
+    @Override
+    public List<CheckoutRegister> getAll() {
         List<CheckoutRegister> registers = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
+        try (Connection conn = getConnection()) {
             String sql = "SELECT * FROM checkout_registers";
             ResultSet rs = conn.createStatement().executeQuery(sql);
             
@@ -73,9 +82,9 @@ public class CheckoutRegisterDAO {
                 int id = rs.getInt("id");
                 int organizationId = rs.getInt("organization_id");
                 
-                Organization organization = OrganizationDAO.getById(organizationId);
+                Organization organization = organizationDAO.getById(organizationId);    
                 if (organization != null) {
-                    registers.add(new CheckoutRegister(id, new BuyList(), WorkshiftDAO.getById(1), organization));
+                    registers.add(new CheckoutRegister(id, new BuyList(), workshiftDAO.getById(1), organization));
                 }
             }
         } catch (SQLException e) {
@@ -84,31 +93,13 @@ public class CheckoutRegisterDAO {
         return registers;
     }
 
-    public static void saveBuyList(BuyList buyList) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
-            String sql = "INSERT INTO buy_lists (totalSum) VALUES (?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pstmt.setLong(1, buyList.getTotalSum().longValue());
-            pstmt.executeUpdate();
+    @Override
+    public CheckoutRegister save(CheckoutRegister instance) {
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
 
-            ResultSet rs = pstmt.getGeneratedKeys();
-            if (rs.next()) {
-                int buyListId = rs.getInt(1);
-                buyList.setId(buyListId);
-
-                String itemsSql = "INSERT INTO buy_list_items (quantity, bought_price, buy_lists, product_id) VALUES (?, ?, ?, ?)";
-                PreparedStatement itemsStmt = conn.prepareStatement(itemsSql);
-                
-                for (BuyListItem item : buyList.getItems()) {
-                    itemsStmt.setInt(1, item.getQuantity());
-                    itemsStmt.setLong(2, item.getBoughtPrice().longValue());
-                    itemsStmt.setInt(3, buyListId);
-                    itemsStmt.setInt(4, Integer.parseInt(item.getProduct().getId()));
-                    itemsStmt.executeUpdate();
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void delete(CheckoutRegister instance) {
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 }

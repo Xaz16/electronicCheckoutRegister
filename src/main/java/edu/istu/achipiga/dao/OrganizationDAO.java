@@ -4,7 +4,6 @@ import edu.istu.achipiga.Employee;
 import edu.istu.achipiga.Location;
 import edu.istu.achipiga.Organization;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,12 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class OrganizationDAO {
-    private static Organization curr = null;
-
-    public static Organization getCurrentOrganization() {
-        if(curr != null) return curr;
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
+public class OrganizationDAO extends BaseDAO<Organization> {
+    @Override
+    public Organization getCurrent() {
+        if(super.getCurrentInstance() != null) return super.getCurrentInstance();
+        try (Connection conn = getConnection()) {
             ResultSet orgRs = conn.createStatement().executeQuery("SELECT * FROM organizations WHERE id = 1");
             ResultSet locationRs = conn.createStatement().executeQuery("SELECT * FROM locations WHERE organization_id = 1");
             ResultSet employeeRs = conn.createStatement().executeQuery("SELECT * FROM employees WHERE organization_id = 1");
@@ -43,7 +41,7 @@ public class OrganizationDAO {
 
             }
 
-            curr = new Organization(
+            super.setCurrentInstance(new Organization(
                     orgRs.getString("id"),
                     orgRs.getString("name"),
                     employees,
@@ -55,15 +53,16 @@ public class OrganizationDAO {
                     ),
                     orgRs.getString("inn"),
                     boss
-            );
+            ));
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return curr;
+        return super.getCurrentInstance();
     }
 
-    public static Organization getById(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
+    @Override
+    public Organization getById(int id) {
+        try (Connection conn = getConnection()) {
             String sql = "SELECT * FROM organizations WHERE id = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
@@ -122,4 +121,20 @@ public class OrganizationDAO {
             return null;
         }
     }
+
+    @Override
+    void delete(Organization instance) {
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    List<Organization> getAll() {
+        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
+    }
+
+    @Override
+    Organization save(Organization instance) {
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+    
 }

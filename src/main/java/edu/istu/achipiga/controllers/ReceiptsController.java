@@ -1,7 +1,7 @@
 package edu.istu.achipiga.controllers;
 
 import edu.istu.achipiga.Receipt;
-import edu.istu.achipiga.dao.ReceiptDAO;
+import edu.istu.achipiga.dao.DAOFactory;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,10 +14,6 @@ import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -134,7 +130,7 @@ public class ReceiptsController {
         });
     }
     public void loadReceipts() {
-        receipts = FXCollections.observableArrayList(ReceiptDAO.loadReceipts());
+        receipts = FXCollections.observableArrayList(DAOFactory.getInstance().getReceiptDAO().getAll());
         receiptsTable.setItems(receipts);
     }
 

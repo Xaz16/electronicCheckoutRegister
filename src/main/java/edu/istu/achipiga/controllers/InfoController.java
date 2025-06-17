@@ -2,7 +2,7 @@ package edu.istu.achipiga.controllers;
 
 import edu.istu.achipiga.Employee;
 import edu.istu.achipiga.Organization;
-import edu.istu.achipiga.dao.OrganizationDAO;
+import edu.istu.achipiga.dao.DAOFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,7 +22,7 @@ public class InfoController {
     private Organization organization;
 
     public void initialize() {
-        organization = OrganizationDAO.getCurrentOrganization();
+        organization = DAOFactory.getInstance().getOrganizationDAO().getCurrent();
         nameLabel.textProperty().bind(new SimpleStringProperty(organization.name));
         innLabel.textProperty().bind(new SimpleStringProperty(organization.inn));
         locationLabel.textProperty().bind(new SimpleStringProperty(organization.location.toString()));

@@ -1,7 +1,8 @@
 package edu.istu.achipiga.controllers;
 
 import edu.istu.achipiga.Product;
-import edu.istu.achipiga.dao.ProductDAO;
+import edu.istu.achipiga.dao.DAOFactory;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
@@ -47,9 +48,10 @@ public class ProductsController {
         });
 
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            productsTable.setItems(ProductDAO.getAllProducts(newValue));
+            DAOFactory.getInstance().getProductDAO().getContext().setSearchQuery(newValue);
+            productsTable.setItems(FXCollections.observableArrayList(DAOFactory.getInstance().getProductDAO().getAll()));
         });
 
-        productsTable.setItems(ProductDAO.getAllProducts(""));
+        productsTable.setItems(FXCollections.observableArrayList(DAOFactory.getInstance().getProductDAO().getAll()));
     }
 }

@@ -1,8 +1,7 @@
 package edu.istu.achipiga.controllers;
 
 import edu.istu.achipiga.*;
-import edu.istu.achipiga.dao.CustomerDAO;
-import edu.istu.achipiga.dao.ReceiptDAO;
+import edu.istu.achipiga.dao.DAOFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -80,7 +79,7 @@ public class PaymentController implements Initializable {
                 cashAmountField.setText("");
                 changeLabelValue.setText("");
 
-                BankCard bankCard = CustomerDAO.getCurrentCustomer().getBankCard();
+                BankCard bankCard = DAOFactory.getInstance().getCustomerDAO().getCurrent().getBankCard();
                 if (bankCard == null) {
                     showError("У клиента нет банковской карты");
                     return;
@@ -165,7 +164,7 @@ public class PaymentController implements Initializable {
         }
 
         Receipt receipt = new Receipt(
-            CustomerDAO.getCurrentCustomer(),
+            DAOFactory.getInstance().getCustomerDAO().getCurrent(),
             checkoutRegister,
             paidAmount,
             method
@@ -173,7 +172,7 @@ public class PaymentController implements Initializable {
         
         
         if(method == PaymentMethods.CARD) {
-            BankCard bankCard = CustomerDAO.getCurrentCustomer().getBankCard();
+            BankCard bankCard = DAOFactory.getInstance().getCustomerDAO().getCurrent().getBankCard();
             receipt.setBankCard(bankCard);
         } else {
             receipt.setBankCard(null);

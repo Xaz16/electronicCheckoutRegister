@@ -1,7 +1,7 @@
 package edu.istu.achipiga.controllers;
 
 import edu.istu.achipiga.ElectronicCheckoutRegister;
-import edu.istu.achipiga.dao.CheckoutRegisterDAO;
+import edu.istu.achipiga.dao.DAOFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,7 +20,7 @@ public class MainController {
     
     @FXML
     public void initialize() {
-        CheckoutRegisterDAO.getCurrentCheckoutRegister();
+        DAOFactory.getInstance().getCheckoutRegisterDAO().getCurrent();
         setupNavigation();
     }
     
