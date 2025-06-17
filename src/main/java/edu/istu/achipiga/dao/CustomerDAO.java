@@ -23,7 +23,7 @@ public class CustomerDAO extends BaseDAO<Customer> {
                     customerRs.getString("id"),
                     customerRs.getString("name"),
                     new DiscountCard(DiscountTypes.valueOf(discountCardRs.getString("type")), discountCardRs.getString("id")),
-                    new BankCard(bankCardRs.getString("id"), bankCardRs.getString("number"), bankCardRs.getString("cvv"), bankCardRs.getString("expire_date"))
+                    new BankCard(bankCardRs.getString("number"), bankCardRs.getString("cvv"), bankCardRs.getString("expire_date"), bankCardRs.getString("id"))
 
             ));
         } catch (SQLException e) {
