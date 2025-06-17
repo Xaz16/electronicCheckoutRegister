@@ -45,6 +45,14 @@ public class Receipt {
     @Getter
     private ReceiptTypes receiptType;
 
+    @Getter
+    @Setter
+    private BuyList buyList;
+
+    @Getter
+    @Setter
+    private BankCard bankCard;
+
 
     public Receipt(Customer customer, CheckoutRegister checkoutRegister, BigDecimal providedSum, PaymentMethods paymentMethod) {
         this.id = new Random().nextInt(1_000_001);
@@ -62,11 +70,12 @@ public class Receipt {
         this.id = id;
     }
 
-
-    public String getPaymentMethodLabelString() {
-        return switch (paymentMethod) {
-            case CASH -> "Наличными";
-            case CARD -> "Банковской картой";
-        };
+    public BigDecimal getFinalSum() {
+        return totalAmount.subtract(discountAmount);
     }
+
+    public BigDecimal getExchange() {
+        return providedSum.subtract(getFinalSum());
+    }
+
 }

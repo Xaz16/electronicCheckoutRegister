@@ -25,11 +25,13 @@ public class ReceiptController {
     @FXML private Label typeLabel;
     @FXML private Label customerLabel;
     @FXML private Label paymentMethodLabel;
+    @FXML private Label cardNumberLabel;
+    @FXML private Label cardNumberValue;
     @FXML private Label paidSumLabel;
     @FXML private Label discountLabel;
     @FXML private Label exchangeLabel;
     @FXML private Label totalLabel;
-    
+    @FXML private Label finalSumLabel;
     @FXML private TableView<BuyListItem> itemsTable;
     @FXML private TableColumn<BuyListItem, String> productColumn;
     @FXML private TableColumn<BuyListItem, BigDecimal> priceColumn;
@@ -97,20 +99,25 @@ public class ReceiptController {
         
         typeLabel.setText(receipt.getReceiptType().getLabel());
         customerLabel.setText(receipt.getCustomer().getName());
-        paymentMethodLabel.setText(receipt.getPaymentMethodLabelString());
-        
+        paymentMethodLabel.setText(receipt.getPaymentMethod().getLabel());
+
+        cardNumberLabel.setVisible(receipt.getBankCard() != null);
+        cardNumberValue.setVisible(receipt.getBankCard() != null);
+
+        if(receipt.getBankCard() != null) {
+            cardNumberValue.setText("**** **** **** " + receipt.getBankCard().getNumber().substring(12));
+        }
+
         paidSumLabel.setText(formatCurrency(receipt.getProvidedSum()));
         discountLabel.setText(formatCurrency(receipt.getDiscountAmount()));
         
-        BigDecimal exchange = receipt.getProvidedSum()
-            .subtract(receipt.getTotalAmount())
-            .add(receipt.getDiscountAmount());
-        exchangeLabel.setText(formatCurrency(exchange));
+        exchangeLabel.setText(formatCurrency(receipt.getExchange()));
         
         totalLabel.setText(formatCurrency(receipt.getTotalAmount()));
+        finalSumLabel.setText(formatCurrency(receipt.getFinalSum()));
 
         
-        items.setAll(receipt.getCheckoutRegister().getBuyList().getItems());
+        items.setAll(receipt.getBuyList().getItems());
         itemsTable.setItems(items);
     }
 

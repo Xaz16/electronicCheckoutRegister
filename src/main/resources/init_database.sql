@@ -104,7 +104,7 @@ CREATE TABLE receipts (
     time TEXT NOT NULL,
     workshift_id INTEGER NOT NULL,
     customer_id INTEGER NOT NULL,
-    bank_card_id INTEGER NOT NULL,
+    bank_card_id INTEGER,
     checkout_register_id INTEGER NOT NULL,
     buy_list_id INTEGER NOT NULL,
     payment_method TEXT NOT NULL,

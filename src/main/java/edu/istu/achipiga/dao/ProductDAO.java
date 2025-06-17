@@ -11,13 +11,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ProductDAO {
-    private static ObservableList<edu.istu.achipiga.Product> curr = null;
 
-    public static ObservableList<edu.istu.achipiga.Product> getAllProducts() {
-        if(curr != null) return curr;
+    public static ObservableList<edu.istu.achipiga.Product> getAllProducts(String search) {
+
         ObservableList<edu.istu.achipiga.Product> products = FXCollections.observableArrayList();
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
-            ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM products");
+            ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM products WHERE name LIKE '%" + search + "%'");
             while (rs.next()) {
                 products.add(new edu.istu.achipiga.Product(
                         rs.getString("id"),
@@ -26,11 +25,11 @@ public class ProductDAO {
                         BigDecimal.valueOf(rs.getLong("price"))
                 ));
             }
-            curr = products;
+            return products;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return curr;
+        return FXCollections.observableArrayList();
     }
 
     public static edu.istu.achipiga.Product getById(int id) {

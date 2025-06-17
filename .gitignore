@@ -38,3 +38,4 @@ build/
 .DS_Store
 
 checkout_register.db
+notes.txt

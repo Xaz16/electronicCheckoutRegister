@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.math.BigInteger;
@@ -20,6 +21,7 @@ public class Products {
     @FXML private TableColumn<Product, BigInteger> priceColumn;
     @FXML private TableColumn<Product, String> categoryColumn;
     @FXML private TableColumn<Product, Void> actionColumn;
+    @FXML private TextField searchField;
 
     public void initialize() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -44,7 +46,10 @@ public class Products {
             }
         });
 
-        
-        productsTable.setItems(ProductDAO.getAllProducts());
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            productsTable.setItems(ProductDAO.getAllProducts(newValue));
+        });
+
+        productsTable.setItems(ProductDAO.getAllProducts(""));
     }
 }

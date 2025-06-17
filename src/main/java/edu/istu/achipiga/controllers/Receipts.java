@@ -33,6 +33,7 @@ public class Receipts {
     @FXML private TableColumn<Receipt, BigDecimal> paidSumColumn;
     @FXML private TableColumn<Receipt, BigDecimal> exchangeColumn;
     @FXML private TableColumn<Receipt, BigDecimal> discountColumn;
+    @FXML private TableColumn<Receipt, BigDecimal> finalColumn;
     @FXML private TableColumn<Receipt, BigDecimal> totalColumn;
     @FXML private Button viewDetailsButton;
 
@@ -74,7 +75,7 @@ public class Receipts {
             new ReadOnlyObjectWrapper<>(cellData.getValue().getCustomer().getName()));
         
         paymentMethodColumn.setCellValueFactory(cellData -> 
-            new ReadOnlyObjectWrapper<>(cellData.getValue().getPaymentMethodLabelString()));
+            new ReadOnlyObjectWrapper<>(cellData.getValue().getPaymentMethod().getLabel()));
         
         paidSumColumn.setCellValueFactory(new PropertyValueFactory<>("providedSum"));
         paidSumColumn.setCellFactory(col -> new TableCell<Receipt, BigDecimal>() {
@@ -86,9 +87,7 @@ public class Receipts {
         });
         
         exchangeColumn.setCellValueFactory(cellData -> {
-            BigDecimal exchange = cellData.getValue().getProvidedSum()
-                .subtract(cellData.getValue().getTotalAmount())
-                .add(cellData.getValue().getDiscountAmount());
+            BigDecimal exchange = cellData.getValue().getExchange();
             return new ReadOnlyObjectWrapper<>(exchange);
         });
         exchangeColumn.setCellFactory(col -> new TableCell<Receipt, BigDecimal>() {
@@ -108,7 +107,24 @@ public class Receipts {
             }
         });
         
-        totalColumn.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
+        finalColumn.setCellValueFactory(cellData -> {
+            BigDecimal finalSum = cellData.getValue().getFinalSum();
+            return new ReadOnlyObjectWrapper<>(finalSum);
+        });
+        
+        finalColumn.setCellFactory(col -> new TableCell<Receipt, BigDecimal>() {
+            @Override
+            protected void updateItem(BigDecimal amount, boolean empty) {
+                super.updateItem(amount, empty);
+                setText(empty ? null : formatCurrency(amount));
+            }
+        });
+
+        totalColumn.setCellValueFactory(cellData -> {
+            BigDecimal total = cellData.getValue().getTotalAmount();
+            return new ReadOnlyObjectWrapper<>(total);
+        });
+
         totalColumn.setCellFactory(col -> new TableCell<Receipt, BigDecimal>() {
             @Override
             protected void updateItem(BigDecimal amount, boolean empty) {
@@ -117,24 +133,9 @@ public class Receipts {
             }
         });
     }
-
-    private void loadReceipts() {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
-            String sql = "SELECT * FROM receipts ORDER BY time DESC";
-            ResultSet rs = conn.createStatement().executeQuery(sql);
-            
-            while (rs.next()) {
-                Receipt receipt = ReceiptDAO.getById(rs.getInt("id"));
-                if (receipt != null) {
-                    receipts.add(receipt);
-                }
-            }
-            
-            receiptsTable.setItems(receipts);
-        } catch (SQLException e) {
-            System.out.println("Error loading receipts: " + e.getMessage());
-            e.printStackTrace();
-        }
+    public void loadReceipts() {
+        receipts = FXCollections.observableArrayList(ReceiptDAO.loadReceipts());
+        receiptsTable.setItems(receipts);
     }
 
     private String formatCurrency(BigDecimal amount) {

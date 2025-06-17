@@ -31,6 +31,9 @@
         
         <Label text="Способ оплаты:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
         <Label fx:id="paymentMethodLabel" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+        <Label fx:id="cardNumberLabel" text="Номер карты:" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+        <Label fx:id="cardNumberValue" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
     </GridPane>
 
     <Label text="Товары:" style="-fx-font-size: 16px;"/>
@@ -45,17 +48,20 @@
     </TableView>
 
     <GridPane vgap="10" hgap="10">
-        <Label text="Оплачено:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-        <Label fx:id="paidSumLabel" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        <Label text="Сумма:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <Label fx:id="totalLabel" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
         
         <Label text="Скидка:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
         <Label fx:id="discountLabel" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
         
-        <Label text="Сдача:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-        <Label fx:id="exchangeLabel" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-        
-        <Label text="Итого:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-        <Label fx:id="totalLabel" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+        <Label text="Итог:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <Label fx:id="finalSumLabel" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+        <Label text="Оплачено:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <Label fx:id="paidSumLabel" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+        <Label text="Сдача:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+        <Label fx:id="exchangeLabel" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
     </GridPane>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">

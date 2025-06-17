@@ -244,10 +244,10 @@ public class Checkout {
         content.append(String.format("Покупатель: %s\n", receipt.getCustomer().getName()));
         content.append(String.format("Сумма покупки (до скидки): %,.2f руб.\n", receipt.getTotalAmount()));
         content.append(String.format("Скидка: %,.2f руб.\n", receipt.getDiscountAmount()));
-        content.append(String.format("Итого к оплате: %,.2f руб.\n", receipt.getTotalAmount().subtract(receipt.getDiscountAmount())));
+        content.append(String.format("Итого к оплате: %,.2f руб.\n", receipt.getFinalSum()));
         content.append(String.format("Внесено: %,.2f руб.\n", receipt.getProvidedSum()));
-        content.append(String.format("Сдача: %,.2f руб.\n", receipt.getProvidedSum().subtract(receipt.getTotalAmount().subtract(receipt.getDiscountAmount()))));
-        content.append(String.format("Способ оплаты: %s\n", receipt.getPaymentMethodLabelString()));
+        content.append(String.format("Сдача: %,.2f руб.\n", receipt.getExchange()));
+        content.append(String.format("Способ оплаты: %s\n", receipt.getPaymentMethod().getLabel()));
         content.append(String.format("\nОрганизация: %s", 
             receipt.getCheckoutRegister().getOrganization().name));
         

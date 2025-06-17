@@ -23,10 +23,11 @@
             <TableColumn fx:id="typeColumn" text="Тип" prefWidth="100"/>
             <TableColumn fx:id="customerColumn" text="Клиент" prefWidth="150"/>
             <TableColumn fx:id="paymentMethodColumn" text="Способ оплаты" prefWidth="120"/>
+            <TableColumn fx:id="totalColumn" text="Сумма" prefWidth="100"/>
+            <TableColumn fx:id="discountColumn" text="Скидка" prefWidth="100"/>
+            <TableColumn fx:id="finalColumn" text="Итого" prefWidth="100"/>
             <TableColumn fx:id="paidSumColumn" text="Оплачено" prefWidth="100"/>
             <TableColumn fx:id="exchangeColumn" text="Сдача" prefWidth="100"/>
-            <TableColumn fx:id="discountColumn" text="Скидка" prefWidth="100"/>
-            <TableColumn fx:id="totalColumn" text="Итого" prefWidth="100"/>
         </columns>
     </TableView>
 

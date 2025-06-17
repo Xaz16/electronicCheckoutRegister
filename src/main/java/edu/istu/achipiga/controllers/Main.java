@@ -8,7 +8,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 
@@ -33,9 +32,8 @@ public class Main {
         TreeItem<String> checkout = new TreeItem<>("Касса");
         TreeItem<String> receipts = new TreeItem<>("Чеки");
         TreeItem<String> info = new TreeItem<>("Информация");
-        TreeItem<String> exit = new TreeItem<>("Выход");
         
-        root.getChildren().addAll(products, checkout, receipts, info, exit);
+        root.getChildren().addAll(products, checkout, receipts, info);
         navTree.setRoot(root);
         
         navTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -45,7 +43,6 @@ public class Main {
                     case "Касса" -> showCheckout();
                     case "Чеки" -> showReports();
                     case "Информация" -> showInfo();
-                    case "Выход" -> onExit();
                 }
             }
         });
@@ -69,10 +66,6 @@ public class Main {
         loadView("Info.fxml");
     }
     
-    private void onExit() {
-        Stage stage = (Stage) navTree.getScene().getWindow();
-        stage.close();
-    }
     
     private void loadView(String fxml) {
         try {

@@ -22,6 +22,8 @@ public class Payment implements Initializable {
     @FXML
     private TextField cashAmountField;
     @FXML
+    private Label changeLabelValue;
+    @FXML
     private Label changeLabel;
     @FXML
     private ComboBox<String> paymentMethodComboBox;
@@ -50,8 +52,8 @@ public class Payment implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        paymentMethodComboBox.getItems().addAll("Наличными", "Банковской картой");
-        paymentMethodComboBox.setValue("Наличными");
+        paymentMethodComboBox.getItems().addAll(PaymentMethods.CASH.getLabel(), PaymentMethods.CARD.getLabel());
+        paymentMethodComboBox.setValue(PaymentMethods.CASH.getLabel());
         
         
         cardNumberLabel.setVisible(false);
@@ -59,17 +61,37 @@ public class Payment implements Initializable {
         
         cashAmountLabel.setVisible(true);
         cashAmountField.setVisible(true);
+        changeLabelValue.setVisible(true);
         changeLabel.setVisible(true);
+
+        payButton.setDisable(true);
         
         paymentMethodComboBox.setOnAction(event -> {
-            boolean isCardPayment = "Банковской картой".equals(paymentMethodComboBox.getValue());
+            boolean isCardPayment = PaymentMethods.CARD.getLabel().equals(paymentMethodComboBox.getValue());
             cardNumberLabel.setVisible(isCardPayment);
+            cardNumberField.setVisible(isCardPayment);
+
             cashAmountLabel.setVisible(!isCardPayment);
+            cashAmountField.setVisible(!isCardPayment);
+
             changeLabel.setVisible(!isCardPayment);
-            
+            changeLabelValue.setVisible(!isCardPayment);
             if (isCardPayment) {
                 cashAmountField.setText("");
-                changeLabel.setText("");
+                changeLabelValue.setText("");
+
+                BankCard bankCard = CustomerDAO.getCurrentCustomer().getBankCard();
+                if (bankCard == null) {
+                    showError("У клиента нет банковской карты");
+                    return;
+                }
+                if (isValidCardNumber(bankCard.getNumber())) {
+                    cardNumberField.setText("**** **** **** " + bankCard.getNumber().substring(12));
+                    cardNumberField.setEditable(false);
+                }
+                payButton.setDisable(false);
+                cardNumberField.setVisible(true);
+
             } else {
                 cardNumberField.setText("");
             }
@@ -81,7 +103,7 @@ public class Payment implements Initializable {
             } else if (!newVal.isEmpty()) {
                 calculateChange(newVal);
             } else {
-                changeLabel.setText("");
+                changeLabelValue.setText("");
             }
         });
 
@@ -90,18 +112,23 @@ public class Payment implements Initializable {
     }
 
     private void calculateChange(String amountStr) {
+        boolean isValid = false;
         try {
             BigDecimal paidAmount = new BigDecimal(amountStr);
             BigDecimal difference = paidAmount.subtract(amountToPay);
 
             if (difference.compareTo(BigDecimal.ZERO) >= 0) {
-                changeLabel.setText(String.format("Сдача: %,.2f руб.", difference));
+                changeLabelValue.setText(String.format("Сдача: %,.2f руб.", difference));
+                isValid = true;
             } else {
-                changeLabel.setText("Недостаточно средств!");
+                changeLabelValue.setText("Недостаточно средств!");
+                
             }
         } catch (NumberFormatException e) {
-            changeLabel.setText("Ошибка ввода");
+            changeLabelValue.setText("Ошибка ввода");
         }
+
+        payButton.setDisable(!isValid);
     }
 
     public void setDiscountInfo(boolean applied, BigDecimal discount) {
@@ -112,27 +139,20 @@ public class Payment implements Initializable {
     private void handlePayment() {
         String paymentMethod = paymentMethodComboBox.getValue();
         PaymentMethods method;
-        
-        if ("Наличными".equals(paymentMethod)) {
+        BigDecimal paidAmount;
+        if (PaymentMethods.CASH.getLabel().equals(paymentMethod)) {
             method = PaymentMethods.CASH;
-        } else if ("Банковской картой".equals(paymentMethod)) {
+            paidAmount = new BigDecimal(cashAmountField.getText());
+
+        } else if (PaymentMethods.CARD.getLabel().equals(paymentMethod)) {
             method = PaymentMethods.CARD;
-            String cardNumber = cardNumberField.getText();
-            if (cardNumber == null || cardNumber.trim().isEmpty()) {
-                showError("Введите номер карты");
-                return;
-            }
-            if (!isValidCardNumber(cardNumber)) {
-                showError("Неверный формат номера карты");
-                return;
-            }
+            paidAmount = amountToPay;
         } else {
             showError("Выберите способ оплаты");
             return;
         }
 
-        BigDecimal paidAmount = new BigDecimal(cashAmountField.getText());
-        if ("Наличными".equals(paymentMethod)) {
+        if (method == PaymentMethods.CASH) {
             try {
                 if (paidAmount.compareTo(amountToPay) < 0) {
                     showError("Внесенная сумма меньше суммы к оплате");
@@ -150,8 +170,15 @@ public class Payment implements Initializable {
             paidAmount,
             method
         );
-
-
+        
+        
+        if(method == PaymentMethods.CARD) {
+            BankCard bankCard = CustomerDAO.getCurrentCustomer().getBankCard();
+            receipt.setBankCard(bankCard);
+        } else {
+            receipt.setBankCard(null);
+        }
+        
         receipt.setTotalAmount(amountToPay);
 
         if (discountApplied) {
@@ -159,11 +186,10 @@ public class Payment implements Initializable {
         }
 
         try {
-            ReceiptDAO.insertNew(receipt);
-            showSuccess("Оплата прошла успешно!");
             callback.onPaymentSuccess(receipt);
         } catch (Exception e) {
             showError("Ошибка при сохранении чека: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -174,14 +200,6 @@ public class Payment implements Initializable {
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Ошибка");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private void showSuccess(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Успех");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
