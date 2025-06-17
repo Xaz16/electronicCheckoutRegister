@@ -7,10 +7,6 @@
 <?import javafx.scene.layout.*?>
 
 <VBox stylesheets="/Payment.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" spacing="15" style="-fx-padding: 20;" fx:controller="edu.istu.achipiga.controllers.Payment" alignment="TOP_CENTER">
-    <fx:define>
-        <ToggleGroup fx:id="paymentMethodGroup"/>
-    </fx:define>
-
     <Label text="Оплата покупки" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
 
     <GridPane hgap="10" vgap="10" alignment="CENTER">
@@ -20,28 +16,23 @@
         </columnConstraints>
 
         <Label text="Сумма к оплате:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
-        <Label fx:id="amountLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+        <Label fx:id="totalSumLabel" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
 
         <Label text="Способ оплаты:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
-        <VBox GridPane.rowIndex="1" GridPane.columnIndex="1" spacing="5">
-            <RadioButton fx:id="cashRadioButton" text="Наличными" toggleGroup="$paymentMethodGroup" userData="CASH" selected="true"/>
-            <RadioButton fx:id="cardRadioButton" text="Банковской картой" toggleGroup="$paymentMethodGroup" userData="CARD"/>
-        </VBox>
+        <ComboBox fx:id="paymentMethodComboBox" GridPane.rowIndex="1" GridPane.columnIndex="1" prefWidth="200"/>
 
-        <Label text="Внесенная сумма:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
+        <Label fx:id="cashAmountLabel" text="Внесенная сумма:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
         <TextField fx:id="cashAmountField" GridPane.rowIndex="2" GridPane.columnIndex="1" promptText="0.00"/>
 
-        <Label text="Номер карты:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
-        <TextField fx:id="cardNumberField" GridPane.rowIndex="3" GridPane.columnIndex="1" promptText="XXXX XXXX XXXX XXXX" visible="false"/>
+        <Label fx:id="changeLabel" text="Сдача:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
+        <Label fx:id="changeLabel" GridPane.rowIndex="3" GridPane.columnIndex="1" style="-fx-font-size: 14; -fx-text-fill: #336699;"/>
 
-        <Label text="Сдача:" GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
-        <Label fx:id="changeLabel" GridPane.rowIndex="4" GridPane.columnIndex="1" style="-fx-font-size: 14; -fx-text-fill: #336699;"/>
+        <Label fx:id="cardNumberLabel" text="Номер карты:" GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-size: 14;"/>
+        <TextField fx:id="cardNumberField" GridPane.rowIndex="4" GridPane.columnIndex="1" promptText="XXXX XXXX XXXX XXXX"/>
     </GridPane>
 
     <HBox spacing="15" alignment="CENTER">
-        <Button text="Назад" onAction="#goBack" style="-fx-base: #F44336; -fx-min-width: 100;"/>
-        <Button text="Подтвердить оплату" onAction="#processPayment" style="-fx-base: #4CAF50; -fx-font-weight: bold; -fx-min-width: 150;"/>
+        <Button fx:id="backButton" text="Назад" style="-fx-base: #F44336; -fx-min-width: 100;"/>
+        <Button fx:id="payButton" text="Подтвердить оплату" style="-fx-base: #4CAF50; -fx-font-weight: bold; -fx-min-width: 150;"/>
     </HBox>
-
-    <Label fx:id="statusLabel" style="-fx-text-fill: #FF5722;"/>
 </VBox>

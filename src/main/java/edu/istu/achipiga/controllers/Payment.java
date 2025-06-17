@@ -1,66 +1,86 @@
 package edu.istu.achipiga.controllers;
 
-import edu.istu.achipiga.CheckoutRegister;
-import edu.istu.achipiga.Customer;
-import edu.istu.achipiga.PaymentMethods;
-import edu.istu.achipiga.Receipt;
-import edu.istu.achipiga.dao.CheckoutRegisterDAO;
+import edu.istu.achipiga.*;
 import edu.istu.achipiga.dao.CustomerDAO;
+import edu.istu.achipiga.dao.ReceiptDAO;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class Payment {
-    @FXML private Label amountLabel;
-    @FXML private Label changeLabel;
-    @FXML private Label statusLabel;
-    @FXML private TextField cashAmountField;
-    @FXML private TextField cardNumberField;
-    @FXML private RadioButton cashRadioButton;
-    @FXML private RadioButton cardRadioButton;
-    @FXML private ToggleGroup paymentMethodGroup;
+public class Payment implements Initializable {
+    @FXML
+    private Label totalSumLabel;
+    @FXML
+    private Label cardNumberLabel;
+    @FXML
+    private TextField cardNumberField;
+    @FXML
+    private Label cashAmountLabel;
+    @FXML
+    private TextField cashAmountField;
+    @FXML
+    private Label changeLabel;
+    @FXML
+    private ComboBox<String> paymentMethodComboBox;
+    @FXML
+    private Button payButton;
+    @FXML
+    private Button backButton;
 
-    private BigDecimal amountToPay = BigDecimal.ZERO;
+    private CheckoutRegister checkoutRegister;
+    private BuyList buyList;
     private PaymentCallback callback;
     private boolean discountApplied = false;
     private BigDecimal discount = BigDecimal.ZERO;
-
-    Customer customer = CustomerDAO.getCurrentCustomer();
-    CheckoutRegister checkoutRegister = CheckoutRegisterDAO.getCurrentCheckoutRegister();
+    private BigDecimal amountToPay = BigDecimal.ZERO;
 
     public interface PaymentCallback {
         void onPaymentSuccess(Receipt receipt);
         void onPaymentCancel();
     }
 
-    @FXML
-    public void initialize() {
-        cashRadioButton.setToggleGroup(paymentMethodGroup);
-        cardRadioButton.setToggleGroup(paymentMethodGroup);
-        cashRadioButton.setSelected(true);
+    public void setup(BigDecimal amount, CheckoutRegister checkoutRegister, PaymentCallback callback) {
+        this.amountToPay = amount;
+        this.checkoutRegister = checkoutRegister;
+        this.callback = callback;
+        totalSumLabel.setText("Итого к оплате: " + amount + " ₽");
+    }
 
-        // Initially show cash-related fields and hide card-related fields
-        cashAmountField.setVisible(true);
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        paymentMethodComboBox.getItems().addAll("Наличными", "Банковской картой");
+        paymentMethodComboBox.setValue("Наличными");
+        
+        // Hide card number fields by default
+        cardNumberLabel.setVisible(false);
         cardNumberField.setVisible(false);
+        
+        // Show cash amount fields by default
+        cashAmountLabel.setVisible(true);
+        cashAmountField.setVisible(true);
         changeLabel.setVisible(true);
-
-        paymentMethodGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                String method = newVal.getUserData().toString();
-                boolean isCash = "CASH".equals(method);
-                
-                cashAmountField.setVisible(isCash);
-                cardNumberField.setVisible(!isCash);
-                changeLabel.setVisible(isCash);
-
-                if (isCash) {
-                    cashAmountField.setText("");
-                    changeLabel.setText("");
-                } else {
-                    cardNumberField.setText("");
-                }
+        
+        paymentMethodComboBox.setOnAction(event -> {
+            boolean isCardPayment = "Банковской картой".equals(paymentMethodComboBox.getValue());
+            cardNumberLabel.setVisible(isCardPayment);
+            cardNumberField.setVisible(isCardPayment);
+            cashAmountLabel.setVisible(!isCardPayment);
+            cashAmountField.setVisible(!isCardPayment);
+            changeLabel.setVisible(!isCardPayment);
+            
+            if (isCardPayment) {
+                cashAmountField.setText("");
+                changeLabel.setText("");
+            } else {
+                cardNumberField.setText("");
             }
         });
 
@@ -73,12 +93,24 @@ public class Payment {
                 changeLabel.setText("");
             }
         });
+
+        payButton.setOnAction(event -> handlePayment());
+        backButton.setOnAction(event -> handleBack());
     }
 
-    public void setup(BigDecimal amount, PaymentCallback callback) {
-        this.amountToPay = amount;
-        this.callback = callback;
-        amountLabel.setText(String.format("%,.2f руб.", amount));
+    private void calculateChange(String amountStr) {
+        try {
+            BigDecimal paidAmount = new BigDecimal(amountStr);
+            BigDecimal difference = paidAmount.subtract(amountToPay);
+
+            if (difference.compareTo(BigDecimal.ZERO) >= 0) {
+                changeLabel.setText(String.format("Сдача: %,.2f руб.", difference));
+            } else {
+                changeLabel.setText("Недостаточно средств!");
+            }
+        } catch (NumberFormatException e) {
+            changeLabel.setText("Ошибка ввода");
+        }
     }
 
     public void setDiscountInfo(boolean applied, BigDecimal discount) {
@@ -86,75 +118,82 @@ public class Payment {
         this.discount = discount;
     }
 
-    private void calculateChange(String amountStr) {
-        if (amountToPay == null) {
-            changeLabel.setText("Ошибка: сумма к оплате не установлена");
+    private void handlePayment() {
+        String paymentMethod = paymentMethodComboBox.getValue();
+        PaymentMethods method;
+        
+        if ("Наличными".equals(paymentMethod)) {
+            method = PaymentMethods.CASH;
+        } else if ("Банковской картой".equals(paymentMethod)) {
+            method = PaymentMethods.CARD;
+            String cardNumber = cardNumberField.getText();
+            if (cardNumber == null || cardNumber.trim().isEmpty()) {
+                showError("Введите номер карты");
+                return;
+            }
+            if (!isValidCardNumber(cardNumber)) {
+                showError("Неверный формат номера карты");
+                return;
+            }
+        } else {
+            showError("Выберите способ оплаты");
             return;
         }
 
-        try {
-            BigDecimal paidAmount = new BigDecimal(amountStr);
-            BigDecimal difference = paidAmount.subtract(amountToPay);
-
-            if (difference.compareTo(BigDecimal.ZERO) >= 0) {
-                changeLabel.setText(String.format("%,.2f руб.", difference));
-                statusLabel.setText("");
-            } else {
-                changeLabel.setText("Недостаточно средств!");
-                statusLabel.setText("Внесите еще " +
-                        String.format("%,.2f руб.", difference.abs()));
-            }
-        } catch (NumberFormatException e) {
-            changeLabel.setText("Ошибка ввода");
-        }
-    }
-
-    @FXML
-    private void processPayment() {
-        PaymentMethods method = PaymentMethods.valueOf(paymentMethodGroup.getSelectedToggle().getUserData().toString());
-
-        switch (method) {
-            case CASH:
-                processCashPayment();
-                break;
-            case CARD:
-                processCardPayment();
-                break;
-        }
-    }
-
-    private void processCashPayment() {
-        try {
-            BigDecimal paidAmount = new BigDecimal(cashAmountField.getText());
-            if (paidAmount.compareTo(amountToPay) >= 0) {
-                Receipt receipt = new Receipt(customer, checkoutRegister, paidAmount, PaymentMethods.CASH);
-                if (discountApplied) {
-                    receipt.setDiscountAmount(checkoutRegister.getBuyList().getTotalSum().multiply(discount));
+        if ("Наличными".equals(paymentMethod)) {
+            try {
+                BigDecimal paidAmount = new BigDecimal(cashAmountField.getText());
+                if (paidAmount.compareTo(amountToPay) < 0) {
+                    showError("Внесенная сумма меньше суммы к оплате");
+                    return;
                 }
-                callback.onPaymentSuccess(receipt);
-            } else {
-                statusLabel.setText("Внесенная сумма меньше суммы к оплате!");
+            } catch (NumberFormatException e) {
+                showError("Введите корректную сумму");
+                return;
             }
-        } catch (NumberFormatException e) {
-            statusLabel.setText("Введите корректную сумму!");
         }
-    }
 
-    private void processCardPayment() {
-        String cardNumber = cardNumberField.getText().trim();
-        if (cardNumber.matches("\\d{4} \\d{4} \\d{4} \\d{4}")) {
-            Receipt receipt = new Receipt(customer, checkoutRegister, amountToPay, PaymentMethods.CARD);
-            if (discountApplied) {
-                receipt.setDiscountAmount(checkoutRegister.getBuyList().getTotalSum().multiply(discount));
-            }
+        Receipt receipt = new Receipt(
+            CustomerDAO.getCurrentCustomer(),
+            checkoutRegister,
+            amountToPay,
+            method
+        );
+
+        if (discountApplied) {
+            receipt.setDiscountAmount(amountToPay.multiply(discount));
+        }
+
+        try {
+            ReceiptDAO.insertNew(receipt);
+            showSuccess("Оплата прошла успешно!");
             callback.onPaymentSuccess(receipt);
-        } else {
-            statusLabel.setText("Введите корректный номер карты!");
+        } catch (Exception e) {
+            showError("Ошибка при сохранении чека: " + e.getMessage());
         }
     }
 
-    @FXML
-    private void goBack() {
+    private boolean isValidCardNumber(String cardNumber) {
+        return cardNumber.matches("\\d{16}");
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Ошибка");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showSuccess(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Успех");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void handleBack() {
         callback.onPaymentCancel();
     }
 }

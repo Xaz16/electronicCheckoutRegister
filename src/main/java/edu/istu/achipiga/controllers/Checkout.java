@@ -180,18 +180,17 @@ public class Checkout {
             Parent paymentView = loader.load();
             Payment paymentController = loader.getController();
             
-            paymentController.setup(getFinalSum(), new Payment.PaymentCallback() {
+            paymentController.setup(getFinalSum(), checkoutRegister, new Payment.PaymentCallback() {
                 @Override
                 public void onPaymentSuccess(Receipt receipt) {
-                    System.out.println("Оплата прошла: " + receipt);
-                    // Save buy list before creating receipt
+                    // Calculate BEFORE clearing the cart
+                    BigDecimal total = calculateTotal();
+                    BigDecimal discountAmount = discountApplied ? total.multiply(discount) : BigDecimal.ZERO;
+
+                    receipt.setTotalAmount(total);
+                    receipt.setDiscountAmount(discountAmount);
+
                     CheckoutRegisterDAO.saveBuyList(checkoutRegister.getBuyList());
-                    
-                    // Set discount information in the receipt
-                    if (discountApplied) {
-                        receipt.setDiscountAmount(calculateTotal().multiply(discount));
-                    }
-                    
                     saveReceipt(receipt);
                     clearCart();
 
@@ -205,7 +204,6 @@ public class Checkout {
 
                 @Override
                 public void onPaymentCancel() {
-                    System.out.println("Оплата отменена");
                     try {
                         Parent view = ViewsService.getInstance().loadViewAndGetRoot("/edu/istu/achipiga/views/Checkout.fxml");
                         contentArea.getChildren().setAll(view);
@@ -215,10 +213,8 @@ public class Checkout {
                 }
             });
 
-            // Pass discount information to the payment controller
             paymentController.setDiscountInfo(discountApplied, discount);
 
-            // Load the payment view into the center area
             contentArea.getChildren().setAll(paymentView);
         } catch (IOException e) {
             e.printStackTrace();
@@ -235,13 +231,14 @@ public class Checkout {
             alert.showAndWait();
             return;
         }
-        showPaymentSuccess(savedReceipt);
+        // Copy the generated ID from savedReceipt to the original receipt
+        receipt.setId(savedReceipt.getId());
+        showPaymentSuccess(receipt);
     }
 
     private void showPaymentSuccess(Receipt receipt) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         
-        // Parse and format the date
         String formattedTime = java.time.Instant.parse(receipt.time)
             .atZone(java.time.ZoneId.systemDefault())
             .format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss dd.MM.yyyy"));

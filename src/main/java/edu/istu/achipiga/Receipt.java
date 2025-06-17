@@ -46,6 +46,10 @@ public class Receipt {
     @Getter
     private ReceiptTypes receiptType;
 
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
     public Receipt(Customer customer, CheckoutRegister checkoutRegister, BigDecimal providedSum, PaymentMethods paymentMethod) {
         this.id = new Random().nextInt(1_000_001);
         this.time = java.time.Instant.now().toString();

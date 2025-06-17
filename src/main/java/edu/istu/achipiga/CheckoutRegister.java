@@ -22,15 +22,8 @@ public class CheckoutRegister {
      * 
      */
     @Getter
-    private Device device;
-
-    /**
-     * 
-     */
-    @Getter
     @Setter
     private BuyList buyList = new BuyList();
-
 
     /**
      * 
@@ -45,9 +38,8 @@ public class CheckoutRegister {
     private Organization organization;
 
 
-    public CheckoutRegister(int id, Device device, BuyList buyList, Workshift workshift, Organization organization) {
+    public CheckoutRegister(int id, BuyList buyList, Workshift workshift, Organization organization) {
         this.id = id;
-        this.device = device;
         this.buyList = buyList;
         this.workshift = workshift;
         this.organization = organization;

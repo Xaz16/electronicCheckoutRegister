@@ -25,7 +25,6 @@ public class Info {
 
     public void initialize() {
         organization = OrganizationDAO.getCurrentOrganization();
-        System.out.println(organization);
         nameLabel.textProperty().bind(new SimpleStringProperty(organization.name));
         innLabel.textProperty().bind(new SimpleStringProperty(organization.inn));
         locationLabel.textProperty().bind(new SimpleStringProperty(organization.location.toString()));

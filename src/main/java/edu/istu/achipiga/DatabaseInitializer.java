@@ -46,8 +46,6 @@ public class DatabaseInitializer {
             String sqlScript = readResourceFile(resourcePath);
 
             if (!sqlScript.trim().isEmpty()) {
-                System.out.println("Executing SQL script:");
-                System.out.println(sqlScript);
                 stmt.executeUpdate(sqlScript);
             }
             return true;
