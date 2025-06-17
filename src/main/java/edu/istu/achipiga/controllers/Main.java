@@ -1,6 +1,5 @@
 package edu.istu.achipiga.controllers;
 
-import edu.istu.achipiga.CheckoutRegister;
 import edu.istu.achipiga.ElectronicCheckoutRegister;
 import edu.istu.achipiga.dao.CheckoutRegisterDAO;
 import javafx.fxml.FXML;
@@ -22,31 +21,23 @@ public class Main {
     
     @FXML
     public void initialize() {
-        // Initialize checkout register
         CheckoutRegisterDAO.getCurrentCheckoutRegister();
-        
         setupNavigation();
     }
     
     private void setupNavigation() {
-        // Create root item
         TreeItem<String> root = new TreeItem<>("Root");
         root.setExpanded(true);
         
-        // Create navigation items
         TreeItem<String> products = new TreeItem<>("Товары");
         TreeItem<String> checkout = new TreeItem<>("Касса");
         TreeItem<String> receipts = new TreeItem<>("Чеки");
         TreeItem<String> info = new TreeItem<>("Информация");
         TreeItem<String> exit = new TreeItem<>("Выход");
         
-        // Add items to root
         root.getChildren().addAll(products, checkout, receipts, info, exit);
-        
-        // Set the root
         navTree.setRoot(root);
         
-        // Add selection listener
         navTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 switch (newValue.getValue()) {
@@ -59,7 +50,6 @@ public class Main {
             }
         });
         
-        // Select first item by default
         navTree.getSelectionModel().select(products);
     }
     

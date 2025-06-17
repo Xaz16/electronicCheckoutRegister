@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -65,5 +66,66 @@ public class OrganizationDAO {
             e.printStackTrace();
         }
         return curr;
+    }
+
+    public static Organization getById(int id) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
+            String sql = "SELECT * FROM organizations WHERE id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            ResultSet orgRs = pstmt.executeQuery();
+            
+            if (!orgRs.next()) {
+                return null;
+            }
+            
+            String locationSql = "SELECT * FROM locations WHERE organization_id = ?";
+            PreparedStatement locationStmt = conn.prepareStatement(locationSql);
+            locationStmt.setInt(1, id);
+            ResultSet locationRs = locationStmt.executeQuery();
+            
+            if (!locationRs.next()) {
+                return null;
+            }
+            
+            String employeeSql = "SELECT * FROM employees WHERE organization_id = ?";
+            PreparedStatement employeeStmt = conn.prepareStatement(employeeSql);
+            employeeStmt.setInt(1, id);
+            ResultSet employeeRs = employeeStmt.executeQuery();
+            
+            List<Employee> employees = new ArrayList<>();
+            Employee boss = null;
+            
+            while (employeeRs.next()) {
+                Employee employee = new Employee(
+                    employeeRs.getInt("id"),
+                    employeeRs.getString("name"),
+                    employeeRs.getString("position")
+                );
+                
+                if (Objects.equals(orgRs.getString("boss_id"), employeeRs.getString("id"))) {
+                    boss = employee;
+                }
+                
+                employees.add(employee);
+            }
+            
+            return new Organization(
+                orgRs.getString("id"),
+                orgRs.getString("name"),
+                employees,
+                new Location(
+                    locationRs.getString("country"),
+                    locationRs.getString("city"),
+                    locationRs.getString("street"),
+                    locationRs.getString("build")
+                ),
+                orgRs.getString("inn"),
+                boss
+            );
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -22,7 +22,7 @@ public class CheckoutRegister {
      * 
      */
     @Getter
-    private List<Device> devices;
+    private Device device;
 
     /**
      * 
@@ -45,9 +45,9 @@ public class CheckoutRegister {
     private Organization organization;
 
 
-    public CheckoutRegister(int id, List<Device> devices, BuyList buyList, Workshift workshift, Organization organization) {
+    public CheckoutRegister(int id, Device device, BuyList buyList, Workshift workshift, Organization organization) {
         this.id = id;
-        this.devices = devices;
+        this.device = device;
         this.buyList = buyList;
         this.workshift = workshift;
         this.organization = organization;
