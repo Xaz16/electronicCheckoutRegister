@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.*;
 import java.math.BigDecimal;
-import java.sql.Time;
 import java.util.*;
 
 /**
@@ -38,6 +36,7 @@ public class Receipt {
     private BigDecimal discountAmount;
 
     @Getter
+    @Setter
     private BigDecimal totalAmount;
 
     @Getter
@@ -46,9 +45,6 @@ public class Receipt {
     @Getter
     private ReceiptTypes receiptType;
 
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
 
     public Receipt(Customer customer, CheckoutRegister checkoutRegister, BigDecimal providedSum, PaymentMethods paymentMethod) {
         this.id = new Random().nextInt(1_000_001);
@@ -58,8 +54,8 @@ public class Receipt {
         this.providedSum = providedSum;
         this.paymentMethod = paymentMethod;
         this.totalAmount = checkoutRegister.getBuyList().getTotalSum();
-        this.discountAmount = BigDecimal.ZERO; // Initialize with zero, will be set later if needed
-        this.receiptType = ReceiptTypes.PAYMENT; // Default to payment type
+        this.discountAmount = BigDecimal.ZERO; 
+        this.receiptType = ReceiptTypes.PAYMENT;
     }
 
     public void setId(int id) {

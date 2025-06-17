@@ -26,7 +26,7 @@ public class Products {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-        // Колонка с кнопкой (самая простая реализация)
+        
         actionColumn.setCellFactory(param -> new TableCell<>() {
             private final Button btn = new Button("Добавить");
 
@@ -44,7 +44,7 @@ public class Products {
             }
         });
 
-        // Загрузка данных
+        
         productsTable.setItems(ProductDAO.getAllProducts());
     }
 }

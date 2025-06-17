@@ -2,9 +2,6 @@ package edu.istu.achipiga;
 
 import lombok.AllArgsConstructor;
 
-import java.io.*;
-import java.util.*;
-
 /**
  * @author Aleksey Chipiga
  */

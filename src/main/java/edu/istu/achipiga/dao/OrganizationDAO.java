@@ -3,11 +3,6 @@ package edu.istu.achipiga.dao;
 import edu.istu.achipiga.Employee;
 import edu.istu.achipiga.Location;
 import edu.istu.achipiga.Organization;
-import edu.istu.achipiga.Product;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
-import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class OrganizationDAO {
     private static Organization curr = null;

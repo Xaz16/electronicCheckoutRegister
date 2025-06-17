@@ -4,13 +4,8 @@ import edu.istu.achipiga.*;
 import edu.istu.achipiga.dao.CustomerDAO;
 import edu.istu.achipiga.dao.ReceiptDAO;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -36,7 +31,6 @@ public class Payment implements Initializable {
     private Button backButton;
 
     private CheckoutRegister checkoutRegister;
-    private BuyList buyList;
     private PaymentCallback callback;
     private boolean discountApplied = false;
     private BigDecimal discount = BigDecimal.ZERO;
@@ -59,11 +53,10 @@ public class Payment implements Initializable {
         paymentMethodComboBox.getItems().addAll("Наличными", "Банковской картой");
         paymentMethodComboBox.setValue("Наличными");
         
-        // Hide card number fields by default
+        
         cardNumberLabel.setVisible(false);
         cardNumberField.setVisible(false);
         
-        // Show cash amount fields by default
         cashAmountLabel.setVisible(true);
         cashAmountField.setVisible(true);
         changeLabel.setVisible(true);
@@ -71,9 +64,7 @@ public class Payment implements Initializable {
         paymentMethodComboBox.setOnAction(event -> {
             boolean isCardPayment = "Банковской картой".equals(paymentMethodComboBox.getValue());
             cardNumberLabel.setVisible(isCardPayment);
-            cardNumberField.setVisible(isCardPayment);
             cashAmountLabel.setVisible(!isCardPayment);
-            cashAmountField.setVisible(!isCardPayment);
             changeLabel.setVisible(!isCardPayment);
             
             if (isCardPayment) {
@@ -140,9 +131,9 @@ public class Payment implements Initializable {
             return;
         }
 
+        BigDecimal paidAmount = new BigDecimal(cashAmountField.getText());
         if ("Наличными".equals(paymentMethod)) {
             try {
-                BigDecimal paidAmount = new BigDecimal(cashAmountField.getText());
                 if (paidAmount.compareTo(amountToPay) < 0) {
                     showError("Внесенная сумма меньше суммы к оплате");
                     return;
@@ -156,9 +147,12 @@ public class Payment implements Initializable {
         Receipt receipt = new Receipt(
             CustomerDAO.getCurrentCustomer(),
             checkoutRegister,
-            amountToPay,
+            paidAmount,
             method
         );
+
+
+        receipt.setTotalAmount(amountToPay);
 
         if (discountApplied) {
             receipt.setDiscountAmount(amountToPay.multiply(discount));

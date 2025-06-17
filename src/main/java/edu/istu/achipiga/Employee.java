@@ -1,10 +1,6 @@
 package edu.istu.achipiga;
 
-import javafx.collections.ObservableArray;
 import lombok.Getter;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * @author Aleksey Chipiga

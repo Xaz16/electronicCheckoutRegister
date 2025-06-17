@@ -2,7 +2,6 @@ package edu.istu.achipiga.dao;
 
 import edu.istu.achipiga.*;
 import java.sql.*;
-import java.math.BigDecimal;
 
 public class ReceiptDAO {
     public static Receipt insertNew(Receipt receipt) {
@@ -30,7 +29,7 @@ public class ReceiptDAO {
             pstmt.setBigDecimal(10, receipt.getDiscountAmount());
             pstmt.setBigDecimal(11, receipt.getTotalAmount());
 
-            int affectedRows = pstmt.executeUpdate();
+            pstmt.executeUpdate();
             
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {

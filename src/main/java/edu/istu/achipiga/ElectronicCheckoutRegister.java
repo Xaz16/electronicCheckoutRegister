@@ -7,15 +7,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.net.URI;
-import java.nio.file.Path;
 
 public class ElectronicCheckoutRegister extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         DatabaseInitializer.initializeDatabase();
         
-        // Initialize ViewsService with primary stage
         ViewsService.getInstance().setPrimaryStage(stage);
 
         Parent root = FXMLLoader.load(getClass().getResource("views/Main.fxml"));

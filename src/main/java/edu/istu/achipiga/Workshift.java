@@ -3,9 +3,6 @@ package edu.istu.achipiga;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.io.*;
-import java.util.*;
-
 /**
  * @author Aleksey Chipiga
  */

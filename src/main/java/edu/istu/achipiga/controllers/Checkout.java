@@ -7,15 +7,12 @@ import edu.istu.achipiga.dao.ReceiptDAO;
 import edu.istu.achipiga.services.ViewsService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
-import lombok.Getter;
+
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -51,19 +48,16 @@ public class Checkout {
         updateTotals();
         updateButtonsState();
         
-        // Wait for the scene to be set
         cartTable.sceneProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 contentArea = (StackPane) newVal.lookup("#contentArea");
             }
         });
 
-        // Add listener to cart items to update button states
         cartTable.getItems().addListener((javafx.collections.ListChangeListener.Change<? extends edu.istu.achipiga.BuyListItem> change) -> {
             updateButtonsState();
         });
 
-        // Add listener to selection model to update remove button state
         cartTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             updateButtonsState();
         });
@@ -183,7 +177,6 @@ public class Checkout {
             paymentController.setup(getFinalSum(), checkoutRegister, new Payment.PaymentCallback() {
                 @Override
                 public void onPaymentSuccess(Receipt receipt) {
-                    // Calculate BEFORE clearing the cart
                     BigDecimal total = calculateTotal();
                     BigDecimal discountAmount = discountApplied ? total.multiply(discount) : BigDecimal.ZERO;
 
@@ -231,7 +224,7 @@ public class Checkout {
             alert.showAndWait();
             return;
         }
-        // Copy the generated ID from savedReceipt to the original receipt
+
         receipt.setId(savedReceipt.getId());
         showPaymentSuccess(receipt);
     }

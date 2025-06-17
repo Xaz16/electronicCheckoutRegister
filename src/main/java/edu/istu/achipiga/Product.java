@@ -1,13 +1,8 @@
 package edu.istu.achipiga;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.Button;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 public class Product {
     @Getter

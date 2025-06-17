@@ -16,7 +16,6 @@ public class DatabaseInitializer {
     private static final String DB_URL = "jdbc:sqlite:checkout_register.db";
 
     public static void initializeDatabase() {
-        // Check if tables already exist
         if (databaseNeedsInitialization()) {
             System.out.println("Initializing database...");
             boolean isSuccess = executeSqlScript("/init_database.sql");
@@ -30,7 +29,6 @@ public class DatabaseInitializer {
 
     private static boolean databaseNeedsInitialization() {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            // Check if products table exists
             return !conn.getMetaData().getTables(null, null, "products", null).next();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -42,7 +40,6 @@ public class DatabaseInitializer {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
 
-            // Read SQL script from resources
             String sqlScript = readResourceFile(resourcePath);
 
             if (!sqlScript.trim().isEmpty()) {

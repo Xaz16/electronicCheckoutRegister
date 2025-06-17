@@ -6,7 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CheckoutRegisterDAO {
+    private static CheckoutRegister instance = null;
+
     public static CheckoutRegister getCurrentCheckoutRegister() {
+        if(instance != null) {
+            return instance;
+        }
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:checkout_register.db")) {
             String sql = "SELECT * FROM checkout_registers ORDER BY id DESC LIMIT 1";
             ResultSet rs = conn.createStatement().executeQuery(sql);
@@ -23,8 +28,10 @@ public class CheckoutRegisterDAO {
             if (organization == null) {
                 return null;
             }
+
+            instance = new CheckoutRegister(id, new BuyList(), WorkshiftDAO.getById(1), organization);
             
-            return new CheckoutRegister(id, new BuyList(), WorkshiftDAO.getById(1), organization);
+            return instance;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;

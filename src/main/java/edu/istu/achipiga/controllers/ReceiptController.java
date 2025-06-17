@@ -46,7 +46,7 @@ public class ReceiptController {
     public void initialize() {
         setupTableColumns();
         
-        // Wait for the scene to be set
+        
         itemsTable.sceneProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 contentArea = (StackPane) newVal.lookup("#contentArea");
@@ -109,7 +109,7 @@ public class ReceiptController {
         
         totalLabel.setText(formatCurrency(receipt.getTotalAmount()));
 
-        // Update items table
+        
         items.setAll(receipt.getCheckoutRegister().getBuyList().getItems());
         itemsTable.setItems(items);
     }

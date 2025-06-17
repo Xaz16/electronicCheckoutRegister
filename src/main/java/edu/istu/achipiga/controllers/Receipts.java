@@ -2,7 +2,6 @@ package edu.istu.achipiga.controllers;
 
 import edu.istu.achipiga.Receipt;
 import edu.istu.achipiga.dao.ReceiptDAO;
-import edu.istu.achipiga.services.ViewsService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,14 +44,14 @@ public class Receipts {
         setupTableColumns();
         loadReceipts();
         
-        // Wait for the scene to be set
+        
         receiptsTable.sceneProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 contentArea = (StackPane) newVal.lookup("#contentArea");
             }
         });
 
-        // Add listener to selection model to update view details button state
+        
         receiptsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             viewDetailsButton.setDisable(newVal == null);
         });
