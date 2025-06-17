@@ -11,15 +11,14 @@ public class Product {
     private String name;
     @Getter
     private String category;
-    public ScanCode scanCode;
     @Getter
     private BigDecimal price;
 
     public Product(String id, String name, String category, BigDecimal price) {
         this.id = id;
         this.name = name;
-        this.category = category;
         this.price = price;
+        this.category = category;
     }
 
     public int getDiscountedPrice(DiscountCard card) {

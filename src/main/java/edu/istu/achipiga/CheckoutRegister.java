@@ -51,14 +51,4 @@ public class CheckoutRegister {
         buyList = new BuyList();
     }
 
-    /**
-     * @param type 
-     * @param listener 
-     * @return
-     */
-    public void listenDeviceEvent(DeviceEventTypes type, Listener listener) {
-        // TODO implement here
-
-    }
-
 }

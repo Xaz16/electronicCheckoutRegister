@@ -5,7 +5,7 @@
     
 <VBox spacing="10" 
       alignment="CENTER_LEFT" 
-      stylesheets="/Products.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.istu.achipiga.controllers.Products" maxHeight="Infinity" prefHeight="Infinity">
+      stylesheets="/Products.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.istu.achipiga.controllers.ProductsController" maxHeight="Infinity" prefHeight="Infinity">
     <Label text="Товары" style="-fx-font-size: 24px;"/>
     <Label text="Поиск" style="-fx-font-size: 14px;"/>
     <TextField fx:id="searchField" style="-fx-font-size: 14px;"/>

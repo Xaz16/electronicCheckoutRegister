@@ -7,25 +7,28 @@ import lombok.Getter;
 /**
  * @author Aleksey Chipiga
  */
-@AllArgsConstructor
-public class BankCard {
-    @Getter
-    private String id;
+
+public class BankCard extends Card {
     /**
      * 
      */
     @Getter
-    public String number;
+    private String cvv;
 
     /**
      * 
      */
     @Getter
-    public String cvv;
+    private String expireDate;
 
-    /**
-     * 
-     */
-    @Getter
-    public String expireDate;
+    public BankCard(String number, String cvv, String expireDate, String id) {
+        super(id, number);
+        this.cvv = cvv;
+        this.expireDate = expireDate;
+    }
+
+    @Override
+    public String getCardType() {
+        return "Bank Card";
+    }
 }

@@ -11,7 +11,7 @@ import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
 
-public class Main {
+public class MainController {
     @FXML
     private StackPane contentArea;
     

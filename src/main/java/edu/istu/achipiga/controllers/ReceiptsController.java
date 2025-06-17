@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-public class Receipts {
+public class ReceiptsController {
     @FXML private TableView<Receipt> receiptsTable;
     @FXML private TableColumn<Receipt, Integer> idColumn;
     @FXML private TableColumn<Receipt, String> timeColumn;

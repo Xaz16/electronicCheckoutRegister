@@ -12,7 +12,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.math.BigInteger;
 
-public class Products {
+public class ProductsController {
 
     @FXML
     private TableView<Product> productsTable;
@@ -35,7 +35,7 @@ public class Products {
             {
                 btn.setOnAction(event -> {
                     Product product = getTableView().getItems().get(getIndex());
-                    Checkout.addProductToCart(product);
+                    CheckoutController.addProductToCart(product);
                 });
             }
 

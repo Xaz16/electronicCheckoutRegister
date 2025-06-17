@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
 
-public class Checkout {
+public class CheckoutController {
     @FXML
     private TableView<edu.istu.achipiga.BuyListItem> cartTable;
     @FXML private TableColumn<edu.istu.achipiga.BuyListItem, Integer> indexColumn;
@@ -172,9 +172,9 @@ public class Checkout {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/edu/istu/achipiga/views/Payment.fxml"));
             Parent paymentView = loader.load();
-            Payment paymentController = loader.getController();
+            PaymentController paymentController = loader.getController();
             
-            paymentController.setup(getFinalSum(), checkoutRegister, new Payment.PaymentCallback() {
+            paymentController.setup(getFinalSum(), checkoutRegister, new PaymentController.PaymentCallback() {
                 @Override
                 public void onPaymentSuccess(Receipt receipt) {
                     BigDecimal total = calculateTotal();
